@@ -40,7 +40,7 @@ phrase_second_photo = {
 }
 
 phrase_first_photo = { # no
-    'rus': "Загрузи второе фото.",
+    'rus': "Загрузи первое фото.",
     'eng': "Load second image."
 }
 
