@@ -3,30 +3,10 @@ import numpy as np
 import cv2
 import requests
 
-
-#import torchvision
 import time
-#import torch
 
-#def box_iou(box1, box2, eps=1e-7):
-#    """
-#    Return intersection-over-union (Jaccard index) of boxes.
-#    Both sets of boxes are expected to be in (x1, y1, x2, y2) format.
-##    Based on https://github.com/pytorch/vision/blob/master/torchvision/ops/boxes.py
-#    Arguments:
-#        box1 (Tensor[N, 4])
-#        box2 (Tensor[M, 4])
-#        eps
-#    Returns:
-#        iou (Tensor[N, M]): the NxM matrix containing the pairwise IoU values for every element in boxes1 and boxes2
- #   """
+from env import URL_LANDMARK_NN, URL_DETECT_NN
 
-#    # inter(N,M) = (rb(N,M,2) - lt(N,M,2)).clamp(0).prod(2)
-#    (a1, a2), (b1, b2) = box1.unsqueeze(1).chunk(2, 2), box2.unsqueeze(0).chunk(2, 2)
-#    inter = (torch.min(a2, b2) - torch.max(a1, b1)).clamp(0).prod(2)
-
-#    # IoU = inter / (area1 + area2 - inter)
-#    return inter / ((a2 - a1).prod(2) + (b2 - b1).prod(2) - inter + eps)
 
 def xywh2xyxy(x):
     """
@@ -206,7 +186,7 @@ def detect_face(image=None, SIZE = 320, show_time = False, debug = False):
     if debug:
         ort_session = onnxruntime.InferenceSession("weights/yolov8n_face.onnx")
     else:
-        response = requests.get('https://storage.yandexcloud.net/face-networks/yolov8n_face.onnx')
+        response = requests.get(URL_DETECT_NN)
         ort_session = onnxruntime.InferenceSession(response.content)
 
     if show_time:
@@ -248,7 +228,7 @@ def predict_keypoints(image, SIZE = 112, show_time = False, debug = False):
     if debug:
         ort_session = onnxruntime.InferenceSession("weights/pfld_pretrained.onnx")
     else:
-        response = requests.get('https://storage.yandexcloud.net/face-networks/model_landmark.onnx')
+        response = requests.get(URL_LANDMARK_NN)
         ort_session = onnxruntime.InferenceSession(response.content)
 
     if show_time:
@@ -260,10 +240,8 @@ def predict_keypoints(image, SIZE = 112, show_time = False, debug = False):
 
     keypoints = ort_outs[1][0] * SIZE * factor_resize
 
-    #visual_keypoints(image, keypoints[192:196]) #100
     return keypoints
 
-#predict_keypoints_onnx()
 
 
 # 1 - 32 ([0:66] points) contour of face
