@@ -1,6 +1,7 @@
 # Ignore all files with the specified name.
 # Scope is all repo folders.
 env.py
+swaper.py
 
 .idea
 __pycache__

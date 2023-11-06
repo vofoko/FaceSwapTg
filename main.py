@@ -104,8 +104,6 @@ async def save_im2(message, state = FSMContext):
         downloaded_file = await bot.download_file(file_info.file_path, destination=f)
         img2 = Image.open(BytesIO(initial_bytes=f.getvalue()))
 
-    #img_url = await message.photo[-2].get_url()
-    #img_url = get_()
     img_url = history_img[user_id]
     response = requests.get(img_url, timeout=5)
     img = Image.open(BytesIO(response.content))
@@ -116,9 +114,6 @@ async def save_im2(message, state = FSMContext):
     img = Image.open(BytesIO(response.content))
     img2 = np.array(img)
 
-    #history_dict[user_id].append(np.array(img))
-
-    #await state.finish()
     await SwaperState.Q1.set()
     await message.answer(phrase_proccesing_photo['eng'])
     await swap(message, np.array(img1), np.array(img2))
@@ -147,32 +142,6 @@ async def swap(message, img1, img2):
     await bot.send_photo(user_id, photo = bio)
 
 
-
-
-
-
-def main():
-     # запускаем лонг поллинг
-
-      # инициализируем бота
-      #bot = Bot(token='2005979668:AAHUavyfh1Y7PrRKuKi9uQgsDosWBxiVoyM')
-      bot = Bot(token='5547113374:AAFygljN_E-EJmd_l_fSJha_ADUq6WGp4qo')
-      # bot = Bot(token=os.environ.get('TOKEN'))
-      dp = Dispatcher(bot, storage=MemoryStorage())
-
-      dp.register_message_handler(start, commands=['start'])
-      #dp.register_message_handler(start_find, commands=['find'])
-      #dp.register_message_handler(change_language, commands=['language'])
-      #dp.register_message_handler(set_language, commands=['rus', 'eng'])
-      #dp.register_message_handler(find_actors, content_types=['photo'])
-
-      bot.get_updates(offset=-1)
-      Bot.set_current(dp.bot)
-      Dispatcher.set_current(dp)
-
-      executor.start_polling(dp, skip_updates=True)
-
-
 class SwaperState(StatesGroup):
     Q1 = State()
     Q2 = State()
@@ -182,52 +151,13 @@ class SwaperState(StatesGroup):
     Q_feedback = State()
 
 
-async def handler(event, context):
-
-    # инициализируем бота
-    #bot = Bot(token='2005979668:AAHUavyfh1Y7PrRKuKi9uQgsDosWBxiVoyM')
-    # bot = Bot(token='5547113374:AAFygljN_E-EJmd_l_fSJha_ADUq6WGp4qo')
-    # bot = Bot(token=os.environ.get('TOKEN'))
-
-
-    bot = Bot(BOT_TOKEN)
-    dp = Dispatcher(bot)
-
-    dp.register_message_handler(start, commands=['start'])
-    #dp.register_message_handler(change_language, commands=['language'])
-    dp.register_message_handler(start_swap, commands=['swap'])
-    #dp.register_message_handler(set_language, commands=['rus', 'eng'])
-    #dp.register_message_handler(find_actors, content_types=['photo'])
-    dp.register_callback_query_handler(change_lang, text=['rus', 'eng'])
-
-    logging.info('start event')
-
-    update = json.loads(event['body'])
-    #log.debug('Update: ' + str(update))
-
-    Bot.set_current(dp.bot)
-    update = types.Update.to_object(update)
-    await dp.process_update(update)
-
-    logging.info('end event')
-
-
-    return {'statusCode': 200, 'body': 'ok'}
-
-
-# запускаем лонг поллинг
-if __name__ == '__main__' and True:
-    # инициализируем бота
+if __name__ == '__main__':
     bot = Bot(token=BOT_TOKEN)
-    #bot = Bot(token='5547113374:AAFygljN_E-EJmd_l_fSJha_ADUq6WGp4qo')
-    #bot = Bot(token='6247122586:AAFQqLoQrW_DKvbi7KNYaq8K5gPJp0UAQp8')
-    # bot = Bot(token=os.environ.get('TOKEN'))
     dp = Dispatcher(bot, storage=MemoryStorage())
 
     dp.register_message_handler(start, commands=['start'])
     dp.register_message_handler(start_swap, commands=['swap'])
     dp.register_message_handler(save_im1, content_types=['photo'], state= SwaperState.Q1)
-    #dp.register_message_handler(save_im1, content_types=['photo'])
     dp.register_message_handler(save_im2, content_types=['photo'], state=SwaperState.Q2)
     dp.register_callback_query_handler(change_lang, text=['rus', 'eng'])
 
